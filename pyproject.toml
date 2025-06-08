@@ -15,7 +15,9 @@ dependencies = [
 [tool.taskipy.tasks]
 qos = { cmd = "black src & isort src & pylint src", help = "Executa todas as ferramentas de qualidade de código."}
 
-dev = { cmd = "python manage.py runserver", help = "Inicia o servidor de desenvolvimento do Django." }
+dev = { cmd = "python manage.py runserver", help = "Inicia o servidor de desenvolvimento do Django."}
+migra = {cmd = "python manage.py makemigrations & python manage.py migrate", help = "Realizar migrações do banco."}
+
 
 [tool.poetry]
 packages = [{include = "breeze", from = "src"}]
