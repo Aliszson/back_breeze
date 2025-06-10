@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    
+    # Seus apps
+    'api_bb.apps.ApiBbConfig',  # Forma moderna e recomendada
 ]
 
 MIDDLEWARE = [
