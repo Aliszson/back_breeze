@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+
 
 class Genero(models.Model):
     """Representa um gênero musical (ex: Rock, Pop, Samba)."""
@@ -38,17 +38,19 @@ class Album(models.Model):
         return f"{self.nome}"
 
 
-class Usuario(AbstractUser):
+class Usuario(models.Model):
     """
     Representa um usuário do sistema, que pode ou não ser crítico musical.
     """
+
+    nome = models.CharField(max_length=10)
     bio = models.TextField(max_length=200)
     foto = models.CharField(max_length=200)
     critico = models.BooleanField(default=False)
     generos_favoritos = models.ManyToManyField(Genero, blank=True)
 
     def __str__(self):
-        return f"{self.username}"
+        return f"{self.nome}"
 
 
 class Artista(models.Model):
