@@ -18,7 +18,15 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ("id", "nome", "bio", "foto", "critico", "generos_favoritos")
+        fields = (
+            "id",
+            "username",
+            "email",
+            "bio",
+            "foto",
+            "critico",
+            "generos_favoritos",
+        )
 
 
 class MusicaSerializer(serializers.ModelSerializer):

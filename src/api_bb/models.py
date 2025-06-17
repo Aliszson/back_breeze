@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -38,19 +39,18 @@ class Album(models.Model):
         return f"{self.nome}"
 
 
-class Usuario(models.Model):
+class Usuario(AbstractUser):
     """
     Representa um usuário do sistema, que pode ou não ser crítico musical.
     """
 
-    nome = models.CharField(max_length=10)
     bio = models.TextField(max_length=200)
     foto = models.CharField(max_length=200)
     critico = models.BooleanField(default=False)
     generos_favoritos = models.ManyToManyField(Genero, blank=True)
 
     def __str__(self):
-        return f"{self.nome}"
+        return f"{self.username}"
 
 
 class Artista(models.Model):
