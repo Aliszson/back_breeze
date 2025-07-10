@@ -47,8 +47,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "djoser",
     "corsheaders",
-    # Seus apps
-    "api_bb.apps.ApiBbConfig",  # Forma moderna e recomendada
+    "api_bb.apps.ApiBbConfig",  
 ]
 
 MIDDLEWARE = [
@@ -160,10 +159,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ==============================================================================
-# CONFIGURAÇÕES DE TERCEIROS E CUSTOMIZADAS
-# ==============================================================================
 
 # --- Configurações do CORS-HEADERS ---
 

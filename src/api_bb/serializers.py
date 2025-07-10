@@ -46,18 +46,18 @@ class UsuarioSimplesSerializer(serializers.ModelSerializer):
 
 
 class AvaliacaoSerializer(serializers.ModelSerializer):
-    # --- CAMPO PARA LEITURA (Mostrar detalhes) ---
+
     musica = MusicaSerializer(read_only=True)
     avaliador = UsuarioSimplesSerializer(read_only=True)
 
-    # --- CAMPO PARA ESCRITA (Receber ID ao criar) ---
+
     musica_id = serializers.PrimaryKeyRelatedField(
         queryset=Musica.objects.all(), source='musica', write_only=True
     )
 
     class Meta:
         model = Avaliacao
-        # Adicionado 'musica_id' para a escrita
+
         fields = ("id", "comentario", "data_avaliacao", "nota", "avaliador", "musica", "musica_id")
         read_only_fields = ("avaliador", "data_avaliacao")
 
