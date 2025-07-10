@@ -10,6 +10,8 @@ from .views import (
     MusicaViewSet,
     UsuarioViewSet,
     PerfilUsuarioView,
+    TopBrasilView,
+    TopMundoView,
 )
 
 router = routers.DefaultRouter()
@@ -26,4 +28,8 @@ urlpatterns = [
     path('auth/users/me/', PerfilUsuarioView.as_view(), name='perfil-usuario'),
     # Rota para a página de detalhes da música
     path('musica-detalhes/<int:deezer_id>/', MusicaDetalheView.as_view(), name='musica-detalhe'),
+    
+    # rotas para os gráficos de músicas mais tocadas
+    path('charts/brasil/', TopBrasilView.as_view(), name='chart-brasil'),
+    path('charts/mundo/', TopMundoView.as_view(), name='chart-mundo'),
 ]
