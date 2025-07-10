@@ -23,4 +23,5 @@ urlpatterns = [
     path("api_bb/", include("api_bb.urls")),
     re_path(r"^auth/", include("djoser.urls")),
     path("auth/", include("djoser.urls.jwt")),
+    path('api_bb/music/', include('api_bb.urls')), 
 ]

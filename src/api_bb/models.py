@@ -48,6 +48,7 @@ class Usuario(AbstractUser):
     foto = models.CharField(max_length=200)
     critico = models.BooleanField(default=False)
     generos_favoritos = models.ManyToManyField(Genero, blank=True)
+    foto = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.username}"
