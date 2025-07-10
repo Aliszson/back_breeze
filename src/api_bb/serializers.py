@@ -27,6 +27,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
             "critico",
             "generos_favoritos",
         )
+        
+        read_only_fields = ("id", "email", "critico", "generos_favoritos")
 
 
 class MusicaSerializer(serializers.ModelSerializer):

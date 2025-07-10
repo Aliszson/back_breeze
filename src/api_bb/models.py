@@ -45,7 +45,7 @@ class Usuario(AbstractUser):
     """
 
     bio = models.TextField(max_length=200)
-    foto = models.CharField(max_length=200, blank=True)
+    foto = models.ImageField(upload_to='fotos_perfil/', blank=True, null=True)
     critico = models.BooleanField(default=False)
     generos_favoritos = models.ManyToManyField(Genero, blank=True)
 
