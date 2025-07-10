@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 from .views import (
     DeezerSearchView,
-    MusicaDetalheView, # Importação necessária
+    MusicaDetalheView,
     AlbumViewSet,
     ArtistaViewSet,
     AvaliacaoViewSet,

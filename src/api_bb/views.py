@@ -51,7 +51,6 @@ class AvaliacaoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        ✅ MODIFICADO: Esta função sobrescreve o comportamento padrão.
         Ela filtra o queryset para retornar apenas as avaliações
         feitas pelo usuário que está logado.
         """
@@ -107,7 +106,7 @@ class TopBrasilView(APIView):
     """
     View que atua como proxy para buscar o chart 'Top Brasil' do Deezer.
     """
-    permission_classes = [] # É um chart público
+    permission_classes = [] 
     authentication_classes = []
 
     def get(self, request, *args, **kwargs):
