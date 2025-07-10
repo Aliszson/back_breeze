@@ -9,6 +9,7 @@ from api_bb.views import (
     GeneroViewSet,
     MusicaViewSet,
     UsuarioViewSet,
+    PerfilUsuarioView,
 )
 
 router = routers.DefaultRouter()
@@ -23,4 +24,5 @@ router.register(r"avaliacoes", AvaliacaoViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path('search/', DeezerSearchView.as_view(), name='deezer-search'),
+    path('auth/users/me/', PerfilUsuarioView.as_view(), name='perfil-usuario'),
 ]

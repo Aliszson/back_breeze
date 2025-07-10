@@ -1,5 +1,6 @@
 import requests
 from rest_framework import viewsets
+from rest_framework import generics, permissions, parsers
 from rest_framework.views import APIView 
 from rest_framework import status
 from rest_framework.response import Response
@@ -31,6 +32,22 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+    
+    
+    
+class PerfilUsuarioView(generics.RetrieveUpdateAPIView):
+    """
+    View para ver e atualizar o perfil do usuário logado.
+    """
+    # Use o seu serializer! Apenas verifique se ele tem a linha 'read_only_fields'.
+    serializer_class = UsuarioSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+
+    def get_object(self):
+       
+         return self.request.user
 
 
 class MusicaViewSet(viewsets.ModelViewSet):
