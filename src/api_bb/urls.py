@@ -1,5 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
+from .views import DeezerSearchView
 
 from api_bb.views import (
     AlbumViewSet,
@@ -21,4 +22,5 @@ router.register(r"avaliacoes", AvaliacaoViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path('search/', DeezerSearchView.as_view(), name='deezer-search'),
 ]
