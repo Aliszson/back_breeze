@@ -49,6 +49,15 @@ class AvaliacaoViewSet(viewsets.ModelViewSet):
     serializer_class = AvaliacaoSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        """
+        ✅ MODIFICADO: Esta função sobrescreve o comportamento padrão.
+        Ela filtra o queryset para retornar apenas as avaliações
+        feitas pelo usuário que está logado.
+        """
+        user = self.request.user
+        return Avaliacao.objects.filter(avaliador=user)
+    
     def perform_create(self, serializer):
         """Associa o usuário logado automaticamente ao criar uma avaliação."""
         serializer.save(avaliador=self.request.user)
@@ -93,3 +102,36 @@ class MusicaDetalheView(APIView):
             )
         serializer = MusicaDetalheSerializer(musica, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class TopBrasilView(APIView):
+    """
+    View que atua como proxy para buscar o chart 'Top Brasil' do Deezer.
+    """
+    permission_classes = [] # É um chart público
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        deezer_url = "https://api.deezer.com/playlist/13278689463/tracks"
+        try:
+            response = requests.get(deezer_url)
+            response.raise_for_status()
+            return Response(response.json(), status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({"error": f"Erro ao contatar a API do Deezer: {e}"}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+class TopMundoView(APIView):
+    """
+    View que atua como proxy para buscar o chart 'Top Mundo' do Deezer.
+    """
+    permission_classes = []
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        deezer_url = "https://api.deezer.com/playlist/3155776842/tracks"
+        try:
+            response = requests.get(deezer_url)
+            response.raise_for_status()
+            return Response(response.json(), status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({"error": f"Erro ao contatar a API do Deezer: {e}"}, status=status.HTTP_502_BAD_GATEWAY)
