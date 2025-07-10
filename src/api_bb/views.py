@@ -1,124 +1,95 @@
 import requests
-from rest_framework import viewsets
-from rest_framework import generics, permissions, parsers
-from rest_framework.views import APIView 
-from rest_framework import status
+from rest_framework import viewsets, generics, status, permissions, parsers
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import Musica, Avaliacao, Genero, Usuario, Album, Artista
 
-from .models import *
 from .serializers import (
-    AlbumSerializer,
-    ArtistaSerializer,
+    MusicaDetalheSerializer,
     AvaliacaoSerializer,
     GeneroSerializer,
-    MusicaSerializer,
     UsuarioSerializer,
+    MusicaSerializer,
+    AlbumSerializer,
+    ArtistaSerializer,
 )
 
-
 class GeneroViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar gêneros musicais.
-    """
-
     queryset = Genero.objects.all()
     serializer_class = GeneroSerializer
 
-
 class UsuarioViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar usuários.
-    """
-
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    
-    
-    
+
 class PerfilUsuarioView(generics.RetrieveUpdateAPIView):
-    """
-    View para ver e atualizar o perfil do usuário logado.
-    """
-    # Use o seu serializer! Apenas verifique se ele tem a linha 'read_only_fields'.
     serializer_class = UsuarioSerializer
     permission_classes = [permissions.IsAuthenticated]
-
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
-
     def get_object(self):
-       
-         return self.request.user
-
+        return self.request.user
 
 class MusicaViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar músicas.
-    """
-
+    """ViewSet para o modelo Musica (usado principalmente pelo router)."""
     queryset = Musica.objects.all()
     serializer_class = MusicaSerializer
 
-
 class AlbumViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar álbuns.
-    """
-
     queryset = Album.objects.all()
     serializer_class = AlbumSerializer
 
-
 class ArtistaViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar artistas.
-    """
-
     queryset = Artista.objects.all()
     serializer_class = ArtistaSerializer
 
-
 class AvaliacaoViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para visualizar, criar, editar e deletar avaliações de músicas ou álbuns.
-    """
-
+    """ViewSet para gerenciar avaliações (Listar, Criar, etc.)."""
     queryset = Avaliacao.objects.all()
     serializer_class = AvaliacaoSerializer
-    
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """Associa o usuário logado automaticamente ao criar uma avaliação."""
+        serializer.save(avaliador=self.request.user)
+
 class DeezerSearchView(APIView):
-    """
-    Uma view que atua como proxy para a API de busca do Deezer.
-    """
-    # Como é uma busca pública, podemos permitir que qualquer usuário (mesmo não autenticado)
-    # a utilize. Djoser/DRF cuidará da autenticação para outros endpoints.
-    permission_classes = [] 
+    permission_classes = []
     authentication_classes = []
-
     def get(self, request, *args, **kwargs):
-        # 1. Pega o termo de busca dos parâmetros da URL (?q=termo)
         search_term = request.query_params.get('q', None)
-
         if not search_term:
-            return Response(
-                {"error": "O parâmetro de busca 'q' é obrigatório."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # 2. Monta e faz a requisição para a API do Deezer
+            return Response({"error": "O parâmetro de busca 'q' é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
         deezer_api_url = "https://api.deezer.com/search"
         params = {'q': search_term}
-
         try:
             response = requests.get(deezer_api_url, params=params)
-            response.raise_for_status()  # Lança um erro para status HTTP 4xx/5xx
-
-            # 3. Retorna os dados do Deezer diretamente para o frontend
-            deezer_data = response.json()
-            return Response(deezer_data, status=status.HTTP_200_OK)
-
+            response.raise_for_status()
+            return Response(response.json(), status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
-            # Em caso de erro de conexão ou da API do Deezer
-            return Response(
-                {"error": f"Erro ao contatar a API do Deezer: {e}"},
-                status=status.HTTP_502_BAD_GATEWAY # "Bad Gateway", pois nosso servidor depende de outro
+            return Response({"error": f"Erro ao contatar a API do Deezer: {e}"}, status=status.HTTP_502_BAD_GATEWAY)
+
+class MusicaDetalheView(APIView):
+    """View para buscar ou criar uma música e retornar seus detalhes."""
+    permission_classes = [IsAuthenticated]
+    def get(self, request, deezer_id):
+        try:
+            musica = Musica.objects.get(deezer_id=deezer_id)
+        except Musica.DoesNotExist:
+            deezer_response = requests.get(f"https://api.deezer.com/track/{deezer_id}")
+            if deezer_response.status_code != 200:
+                return Response({"error": "Música não encontrada no Deezer"}, status=status.HTTP_404_NOT_FOUND)
+            data = deezer_response.json()
+            if 'error' in data:
+                return Response({"error": "Música não encontrada no Deezer"}, status=status.HTTP_404_NOT_FOUND)
+            musica = Musica.objects.create(
+                deezer_id=data['id'],
+                titulo=data['title'],
+                duracao=data['duration'],
+                capa_url=data.get('album', {}).get('cover_big', ''),
+                link_deezer=data.get('link', ''),
+                artista_nome=data.get('artist', {}).get('name', 'Desconhecido'),
+                album_nome=data.get('album', {}).get('title', 'Desconhecido')
             )
+        serializer = MusicaDetalheSerializer(musica, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
